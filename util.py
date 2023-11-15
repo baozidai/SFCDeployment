@@ -20,9 +20,9 @@ def max_flow(bandwidth, src_dict, dst_dict):
                 G.add_edge(i, j, capacity=bandwidth[i][j], weight=1)
 
     # 添加虚拟源点-1和汇点-2
-    for (s, value) in src_dict.items():
+    for (s, value) in list(src_dict.items()):
         G.add_edge(-1, s, capacity=value, weight=1)
-    for (d, value) in dst_dict.items():
+    for (d, value) in list(dst_dict.items()):
         G.add_edge(d, -2, capacity=value, weight=1)
 
     # 最小费用最大流
@@ -30,7 +30,7 @@ def max_flow(bandwidth, src_dict, dst_dict):
 
     flow_matrix = [[0 for col in range(len(bandwidth))] for row in range(len(bandwidth))]
     for i in range(len(bandwidth)):
-        for (j, f) in flow[i].items():
+        for (j, f) in list(flow[i].items()):
             if j >= 0:
                 flow_matrix[i][j] = f
 
@@ -42,7 +42,7 @@ def distance(adj, u, v):
 
     """ Node距离：返回给定两个Node在网络中的距离（跳数） """
 
-    return nx.shortest_path_length(nx.from_numpy_matrix(np.mat(adj)), u, v)
+    return nx.shortest_path_length(nx.from_numpy_array(np.mat(adj)), u, v)
 
 
 def get_avail(request, node_list, request_placement):
@@ -57,7 +57,7 @@ def get_avail(request, node_list, request_placement):
     bottleneck_avail = float("inf")
     for i, nf in enumerate(request_placement[request.id]):
         nf_fail = 1
-        for k in nf.keys():
+        for k in list(nf.keys()):
             nf_fail *= 1 - node_list[k].avail
         nf_avail = 1 - nf_fail
         avail *= nf_avail
@@ -77,7 +77,7 @@ def get_rest_capacity(request, request_placement):
 
     for i, nf in enumerate(request_placement[request.id]):
         rate_sum = 0
-        for (v, instance) in nf.items():
+        for (v, instance) in list(nf.items()):
             rate_sum += instance.capacity
         if rate_sum < request.rate:
             return i
@@ -91,7 +91,7 @@ def get_placement_vector(request, request_placement):
 
     vector = [[request.src]]
     for nf in request_placement[request.id]:
-        vector.append(nf.keys())
+        vector.append(list(nf.keys()))
     vector.append([request.dst])
     return vector
 
@@ -156,10 +156,10 @@ def get_route(bandwidth, request, request_placement):
     flow_assignment = [{request.src: request.rate}]
 
     for i, nf in enumerate(request_placement[request.id]):
-        capacity_sum = sum(instance.capacity for (v, instance) in nf.items())
+        capacity_sum = sum(instance.capacity for (v, instance) in list(nf.items()))
         # 为每个实例确定流量分配
         flow_assignment_nf = {}
-        for (v, instance) in nf.items():
+        for (v, instance) in list(nf.items()):
             # 前面保证了总capacity大于需求的流量，因此实例的capacity不会不够
             c = instance.capacity * request.rate / float(capacity_sum)
             flow_assignment_nf[v] = int(round(c))
@@ -169,7 +169,7 @@ def get_route(bandwidth, request, request_placement):
         max_value_key = max(flow_assignment_nf, key=lambda x: flow_assignment_nf[x])
         flow_assignment_nf[max_value_key] -= delta
 
-        for (v, instance) in nf.items():
+        for (v, instance) in list(nf.items()):
             instance.assignment[request.id] = flow_assignment_nf[v]
             instance.capacity -= flow_assignment_nf[v]
             # 应该不会发生这种事↓↓↓，不过还是严谨一下

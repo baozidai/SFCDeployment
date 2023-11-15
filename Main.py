@@ -8,8 +8,8 @@ import Input
 import Evaluate
 
 """ 输入 """
-nodes_file = "./resources/nodes.csv"
-matrix_file = "./resources/network_matrix.csv"
+nodes_file = "./resources/nodes.csv"  # 点数据
+matrix_file = "./resources/network_matrix.csv"  # 边数据
 node_list, bandwidth, adj, node_pos = Input.data_init(nodes_file, matrix_file)
 # node_list_origin, bandwidth_origin, adj_origin, node_pos = Input.data_init(nodes_file, matrix_file)
 

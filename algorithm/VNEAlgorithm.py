@@ -121,7 +121,7 @@ def get_avg_node_avail(node_list):
 
     """ 计算网络中节点平均可用性 """
 
-    return min(map(lambda node: node.avail, node_list))
+    return min([node.avail for node in node_list])
 
 
 if __name__ == "__main__":
@@ -143,4 +143,4 @@ if __name__ == "__main__":
     request_list = [ni.Request(0, 0, 7, [1, 2, 3], 20, 0.95), ni.Request(1, 0, 3, [2, 3], 15, 0.9)]
 
     vne_deploy(bandwidth, node_list, request_list)
-    print get_avg_node_avail(node_list)
+    print(get_avg_node_avail(node_list))

@@ -196,4 +196,4 @@ if __name__ == "__main__":
 
     # r = max_flow(bandwidth, {1: 50, 4: 50}, {3: 20, 7: 80})
     band = extend_deploy(bandwidth, node_list, request_list)
-    print band
+    print(band)

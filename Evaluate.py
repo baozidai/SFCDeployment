@@ -29,31 +29,31 @@ def evaluate(node_list, bandwidth, node_pos, request_list, request):
     instance_cost = 0
 
     # 结果输出
-    print "======== Deploy Complete ========"
+    print("======== Deploy Complete ========")
 
     for i in range(len(request[0])):
         r = request_list[i]
         nf_instance_num = {}
-        print "Request " + str(r.id) + ":"
-        print "\tSrc: " + str(r.src)
-        print "\tDst: " + str(r.dst)
-        print "\tRate: " + str(r.rate)
-        print "\tAvailability Request: " + str(r.avail)
-        print "\tNF List: " + str(r.nf_list)
+        print("Request " + str(r.id) + ":")
+        print("\tSrc: " + str(r.src))
+        print("\tDst: " + str(r.dst))
+        print("\tRate: " + str(r.rate))
+        print("\tAvailability Request: " + str(r.avail))
+        print("\tNF List: " + str(r.nf_list))
         for j, nf in enumerate(r.nf_list):
-            nf_instance_num[nf] = len(request[0][i][j].keys())
-            print "\t\tNF " + str(nf) + " (" + str(nf_instance_num[nf]) + "): " + str(request[0][i][j].keys())
-        print "\tBandwidth Cost: " + str(np.mat(request[3][i]).sum())
-        instance_cost_request = sum(map(lambda (k, v): v * Global.NF_INSTANCE_COST[k], nf_instance_num.items()))
+            nf_instance_num[nf] = len(list(request[0][i][j].keys()))
+            print("\t\tNF " + str(nf) + " (" + str(nf_instance_num[nf]) + "): " + str(list(request[0][i][j].keys())))
+        print("\tBandwidth Cost: " + str(np.mat(request[3][i]).sum()))
+        instance_cost_request = sum([k_v[1] * Global.NF_INSTANCE_COST[k_v[0]] for k_v in list(nf_instance_num.items())])
         instance_cost += instance_cost_request
-        print "\tInstance State Cost: " + str(instance_cost_request) + "\n"
+        print("\tInstance State Cost: " + str(instance_cost_request) + "\n")
 
-    print "-------- Deploy Info --------"
-    print "Total Bandwidth Cost: " + str(band_cost)
-    print "Total Instance Cost: " + str(instance_cost)
-    print "Total Instances Used: "
+    print("-------- Deploy Info --------")
+    print("Total Bandwidth Cost: " + str(band_cost))
+    print("Total Instance Cost: " + str(instance_cost))
+    print("Total Instances Used: ")
     for i in range(len(request[1])):
-        print "\tNF " + str(i) + ": " + str(request[1][i])
+        print("\tNF " + str(i) + ": " + str(request[1][i]))
 
     # 绘图
     nx.draw_networkx_nodes(G, pos=pos, node_color=[node_list[i].CPU / float(node_list[i].CPU_max) for i in range(len(node_list))], cmap=plt.cm.Reds_r)

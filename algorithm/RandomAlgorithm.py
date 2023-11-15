@@ -36,7 +36,7 @@ def random_deploy(bandwidth_origin, node_list, request_list):
         # 依次部署请求中的nf
         for i, nf in enumerate(request.nf_list):
             # 随机选择一个点
-            sample_node = random.sample(range(len(node_list)), len(node_list))
+            sample_node = random.sample(list(range(len(node_list))), len(node_list))
             # 直到满足资源需求
             for v in sample_node:
                 if node_list[v].CPU > Global.NF_CPU_REQUIREMENT[nf]:

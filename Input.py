@@ -52,7 +52,7 @@ def get_requests(request_num, nf_list_length, rate, avail):
 
     for i in range(request_num):
         r = ni.Request(i, random.choice(src_list), random.choice(dst_list),
-                       random.sample(range(Global.NF_TYPE_NUM), random.randint(nf_list_length[0], nf_list_length[1])),
+                       random.sample(list(range(Global.NF_TYPE_NUM)), random.randint(nf_list_length[0], nf_list_length[1])),
                        random.randint(rate[0], rate[1]), random.uniform(avail[0], avail[1]))
         request_list.append(r)
 
