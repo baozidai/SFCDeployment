@@ -11,8 +11,7 @@ import random
 
 
 def random_deploy(bandwidth_origin, node_list, request_list):
-
-    """ 随机部署算法 """
+    """随机部署算法"""
 
     # 剩余带宽矩阵
     bandwidth = copy.copy(bandwidth_origin)
@@ -63,7 +62,6 @@ def random_deploy(bandwidth_origin, node_list, request_list):
 
         # 可用性和剩余capacity拉满
         while avail_bottleneck_index > -1 or capacity_bottleneck_index > -1:
-
             if avail_bottleneck_index > -1:
                 bottleneck_index = avail_bottleneck_index
             elif capacity_bottleneck_index > -1:
@@ -106,12 +104,23 @@ def random_deploy(bandwidth_origin, node_list, request_list):
             #     raise AssertionError("No CPU!")
 
             """ 增加实例时随机选点有bug，暂时使用更优的部分extend策略 """
-            util.add_instance(bandwidth, node_list, instance_registry, instance_num, request, request_placement,
-                              bottleneck_index)
+            util.add_instance(
+                bandwidth,
+                node_list,
+                instance_registry,
+                instance_num,
+                request,
+                request_placement,
+                bottleneck_index,
+            )
 
             # 计算可用性和剩余capacity
-            avail_bottleneck_index = util.get_avail(request, node_list, request_placement)
-            capacity_bottleneck_index = util.get_rest_capacity(request, request_placement)
+            avail_bottleneck_index = util.get_avail(
+                request, node_list, request_placement
+            )
+            capacity_bottleneck_index = util.get_rest_capacity(
+                request, request_placement
+            )
 
         """ 根据部署位置计算链的网络流 """
         flow_matrix = util.get_route(bandwidth, request, request_placement)

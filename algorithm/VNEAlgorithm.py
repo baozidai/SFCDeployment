@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import networkx as nx
 import numpy as np
 import Global
 import NetworkInfo as ni
@@ -11,8 +10,7 @@ import math
 
 
 def vne_deploy(bandwidth_origin, node_list, request_list):
-
-    """ vne 部署算法 """
+    """vne 部署算法"""
 
     # 剩余带宽矩阵
     bandwidth = copy.copy(bandwidth_origin)
@@ -39,22 +37,37 @@ def vne_deploy(bandwidth_origin, node_list, request_list):
         if avail_max == avail_min:
             r.rank = r.rate / float(rate_sum)
         else:
-            r.rank = r.rate / float(rate_sum) + (r.avail - avail_min) / (avail_max - avail_min)
+            r.rank = r.rate / float(rate_sum) + (r.avail - avail_min) / (
+                avail_max - avail_min
+            )
     request_list = sorted(request_list, key=lambda r: r.rank, reverse=True)
 
     for request in request_list:
-        """ 计算实例平均个数 """
+        """计算实例平均个数"""
         # 节点平均可用性
         avail_avg = get_avg_node_avail(node_list)
-        instance_number_avg = math.ceil(math.log(1-pow(request.avail, len(request.nf_list)), 1-avail_avg))
+        instance_number_avg = math.ceil(
+            math.log(1 - pow(request.avail, len(request.nf_list)), 1 - avail_avg)
+        )
 
         # 找离源点和汇点最近的Node
         candidate_nodes_distance = []
         for v in range(len(node_list)):
             candidate_nodes_distance.append(
-                (v, util.distance(bandwidth, request.src, v) + util.distance(bandwidth, v, request.dst)))
+                (
+                    v,
+                    util.distance(bandwidth, request.src, v)
+                    + util.distance(bandwidth, v, request.dst),
+                )
+            )
         candidate_nodes_distance = sorted(
-            sorted(candidate_nodes_distance, key=lambda n: node_list[n[0]].avail, reverse=True), key=lambda n: n[1])
+            sorted(
+                candidate_nodes_distance,
+                key=lambda n: node_list[n[0]].avail,
+                reverse=True,
+            ),
+            key=lambda n: n[1],
+        )
         # 按照距离源汇点距离之和远近进行排序后的Node表
         candidate_nodes = [n[0] for n in candidate_nodes_distance]
 
@@ -91,19 +104,36 @@ def vne_deploy(bandwidth_origin, node_list, request_list):
 
         for i, nf in enumerate(request.nf_list):
             if instance_num[nf] < instance_number_avg:
-                util.add_instance(bandwidth, node_list, instance_registry, instance_num, request, request_placement, i)
+                util.add_instance(
+                    bandwidth,
+                    node_list,
+                    instance_registry,
+                    instance_num,
+                    request,
+                    request_placement,
+                    i,
+                )
 
         # 所有使用的实例剩余capacity总和
         capacity_bottleneck_index = util.get_rest_capacity(request, request_placement)
 
         # 剩余capacity拉满
-        while (1):
+        while 1:
             # 如果capacity不足
             if capacity_bottleneck_index > -1:
-                util.add_instance(bandwidth, node_list, instance_registry, instance_num, request,
-                                  request_placement, capacity_bottleneck_index)
+                util.add_instance(
+                    bandwidth,
+                    node_list,
+                    instance_registry,
+                    instance_num,
+                    request,
+                    request_placement,
+                    capacity_bottleneck_index,
+                )
 
-                capacity_bottleneck_index = util.get_rest_capacity(request, request_placement)
+                capacity_bottleneck_index = util.get_rest_capacity(
+                    request, request_placement
+                )
             else:
                 break
 
@@ -118,14 +148,12 @@ def vne_deploy(bandwidth_origin, node_list, request_list):
 
 
 def get_avg_node_avail(node_list):
-
-    """ 计算网络中节点平均可用性 """
+    """计算网络中节点平均可用性"""
 
     return min([node.avail for node in node_list])
 
 
 if __name__ == "__main__":
-
     bandwidth = [
         [0, 100, 0, 0, 100, 0, 100, 0],
         [100, 0, 100, 0, 100, 100, 0, 0],
@@ -134,13 +162,24 @@ if __name__ == "__main__":
         [100, 100, 100, 0, 0, 100, 100, 0],
         [0, 100, 0, 100, 100, 0, 100, 100],
         [100, 0, 0, 0, 100, 100, 0, 100],
-        [0, 0, 0, 100, 0, 100, 100, 0]
+        [0, 0, 0, 100, 0, 100, 100, 0],
     ]
 
-    node_list = [ni.Node(0, 100, 0.9), ni.Node(1, 100, 0.9), ni.Node(2, 100, 0.9), ni.Node(3, 100, 0.9),
-                 ni.Node(4, 100, 0.9), ni.Node(5, 100, 0.9), ni.Node(6, 100, 0.8), ni.Node(7, 100, 0.8), ]
+    node_list = [
+        ni.Node(0, 100, 0.9),
+        ni.Node(1, 100, 0.9),
+        ni.Node(2, 100, 0.9),
+        ni.Node(3, 100, 0.9),
+        ni.Node(4, 100, 0.9),
+        ni.Node(5, 100, 0.9),
+        ni.Node(6, 100, 0.8),
+        ni.Node(7, 100, 0.8),
+    ]
 
-    request_list = [ni.Request(0, 0, 7, [1, 2, 3], 20, 0.95), ni.Request(1, 0, 3, [2, 3], 15, 0.9)]
+    request_list = [
+        ni.Request(0, 0, 7, [1, 2, 3], 20, 0.95),
+        ni.Request(1, 0, 3, [2, 3], 15, 0.9),
+    ]
 
     vne_deploy(bandwidth, node_list, request_list)
     print(get_avg_node_avail(node_list))

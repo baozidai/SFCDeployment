@@ -8,8 +8,7 @@ import Global
 
 
 def evaluate(node_list, bandwidth, node_pos, request_list, request):
-
-    """ 部署结果评估，返回总带宽消耗和实例使用量 """
+    """部署结果评估，返回总带宽消耗和实例使用量"""
 
     G = nx.DiGraph()
     for i in range(len(request[2])):
@@ -20,7 +19,7 @@ def evaluate(node_list, bandwidth, node_pos, request_list, request):
 
     # edge_color = []
     edge_labels = {}
-    for (i, j) in G.edges():
+    for i, j in G.edges():
         # edge_color.append(G[i][j]["capacity"])
         edge_labels[(i, j)] = G[i][j]["capacity"]
 
@@ -42,9 +41,21 @@ def evaluate(node_list, bandwidth, node_pos, request_list, request):
         print("\tNF List: " + str(r.nf_list))
         for j, nf in enumerate(r.nf_list):
             nf_instance_num[nf] = len(list(request[0][i][j].keys()))
-            print("\t\tNF " + str(nf) + " (" + str(nf_instance_num[nf]) + "): " + str(list(request[0][i][j].keys())))
+            print(
+                "\t\tNF "
+                + str(nf)
+                + " ("
+                + str(nf_instance_num[nf])
+                + "): "
+                + str(list(request[0][i][j].keys()))
+            )
         print("\tBandwidth Cost: " + str(np.mat(request[3][i]).sum()))
-        instance_cost_request = sum([k_v[1] * Global.NF_INSTANCE_COST[k_v[0]] for k_v in list(nf_instance_num.items())])
+        instance_cost_request = sum(
+            [
+                k_v[1] * Global.NF_INSTANCE_COST[k_v[0]]
+                for k_v in list(nf_instance_num.items())
+            ]
+        )
         instance_cost += instance_cost_request
         print("\tInstance State Cost: " + str(instance_cost_request) + "\n")
 
@@ -56,10 +67,25 @@ def evaluate(node_list, bandwidth, node_pos, request_list, request):
         print("\tNF " + str(i) + ": " + str(request[1][i]))
 
     # 绘图
-    nx.draw_networkx_nodes(G, pos=pos, node_color=[node_list[i].CPU / float(node_list[i].CPU_max) for i in range(len(node_list))], cmap=plt.cm.Reds_r)
+    nx.draw_networkx_nodes(
+        G,
+        pos=pos,
+        node_color=[
+            node_list[i].CPU / float(node_list[i].CPU_max)
+            for i in range(len(node_list))
+        ],
+        cmap=plt.cm.Reds_r,
+    )
     nx.draw_networkx_labels(G, pos=pos)
     nx.draw_networkx_edges(G, pos=pos, alpha=0.4, width=1.5, arrows=False)
-    nx.draw_networkx_edge_labels(G, pos=pos, edge_labels=edge_labels, font_size=10, label_pos=0.2, bbox=dict(facecolor='white', edgecolor='None', alpha=0.65))
+    nx.draw_networkx_edge_labels(
+        G,
+        pos=pos,
+        edge_labels=edge_labels,
+        font_size=10,
+        label_pos=0.2,
+        bbox=dict(facecolor="white", edgecolor="None", alpha=0.65),
+    )
 
     plt.show()
 

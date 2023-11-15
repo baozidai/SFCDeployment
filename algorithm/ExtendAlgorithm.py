@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import networkx as nx
 import numpy as np
 import Global
 import NetworkInfo as ni
@@ -12,8 +11,7 @@ import random
 
 
 def extend_deploy(bandwidth_origin, node_list, request_list):
-
-    """ 扩展部署算法 """
+    """扩展部署算法"""
 
     # 剩余带宽矩阵
     bandwidth = copy.copy(bandwidth_origin)
@@ -40,17 +38,31 @@ def extend_deploy(bandwidth_origin, node_list, request_list):
         if avail_max == avail_min:
             r.rank = r.rate / float(rate_sum)
         else:
-            r.rank = r.rate / float(rate_sum) + (r.avail - avail_min) / (avail_max - avail_min)
+            r.rank = r.rate / float(rate_sum) + (r.avail - avail_min) / (
+                avail_max - avail_min
+            )
     request_list = sorted(request_list, key=lambda r: r.rank, reverse=True)
 
     """ 依次部署请求 """
     for request in request_list:
-
         # 找离源点和汇点最近的Node
         candidate_nodes_distance = []
         for v in range(len(node_list)):
-            candidate_nodes_distance.append((v, util.distance(bandwidth, request.src, v) + util.distance(bandwidth, v, request.dst)))
-        candidate_nodes_distance = sorted(sorted(candidate_nodes_distance, key=lambda n: node_list[n[0]].avail, reverse=True), key=lambda n: n[1])
+            candidate_nodes_distance.append(
+                (
+                    v,
+                    util.distance(bandwidth, request.src, v)
+                    + util.distance(bandwidth, v, request.dst),
+                )
+            )
+        candidate_nodes_distance = sorted(
+            sorted(
+                candidate_nodes_distance,
+                key=lambda n: node_list[n[0]].avail,
+                reverse=True,
+            ),
+            key=lambda n: n[1],
+        )
         # 按照距离源汇点距离之和远近进行排序后的Node表
         candidate_nodes = [n[0] for n in candidate_nodes_distance]
 
@@ -91,22 +103,42 @@ def extend_deploy(bandwidth_origin, node_list, request_list):
         capacity_bottleneck_index = util.get_rest_capacity(request, request_placement)
 
         # 可用性拉满
-        while(1):
+        while 1:
             # 如果可用性不足
             if avail_bottleneck_index > -1:
-                util.add_instance(bandwidth, node_list, instance_registry, instance_num, request, request_placement, avail_bottleneck_index)
+                util.add_instance(
+                    bandwidth,
+                    node_list,
+                    instance_registry,
+                    instance_num,
+                    request,
+                    request_placement,
+                    avail_bottleneck_index,
+                )
                 # 计算可用性
-                avail_bottleneck_index = util.get_avail(request, node_list, request_placement)
+                avail_bottleneck_index = util.get_avail(
+                    request, node_list, request_placement
+                )
             else:
                 break
 
         # 剩余capacity拉满
-        while(1):
+        while 1:
             # 如果capacity不足
             if capacity_bottleneck_index > -1:
-                util.add_instance(bandwidth, node_list, instance_registry, instance_num, request, request_placement, capacity_bottleneck_index)
+                util.add_instance(
+                    bandwidth,
+                    node_list,
+                    instance_registry,
+                    instance_num,
+                    request,
+                    request_placement,
+                    capacity_bottleneck_index,
+                )
                 # 计算可用性
-                capacity_bottleneck_index = util.get_rest_capacity(request, request_placement)
+                capacity_bottleneck_index = util.get_rest_capacity(
+                    request, request_placement
+                )
             else:
                 break
 
@@ -120,9 +152,15 @@ def extend_deploy(bandwidth_origin, node_list, request_list):
     return request_placement, instance_num, bandwidth, flow_matrix_request
 
 
-def simulated_annealing(request_placement, instance_num, bandwidth, flow_matrix_request, bandwidth_origin, node_list):
-
-    """ TODO: 模拟退火 """
+def simulated_annealing(
+    request_placement,
+    instance_num,
+    bandwidth,
+    flow_matrix_request,
+    bandwidth_origin,
+    node_list,
+):
+    """TODO: 模拟退火"""
 
     old_cost = get_total_cost(request_placement)
 
@@ -143,7 +181,7 @@ def simulated_annealing(request_placement, instance_num, bandwidth, flow_matrix_
             new_cost = get_total_cost(new_solution)
 
             delta = new_cost - old_cost
-            P = math.exp((-1 * delta) / T);
+            P = math.exp((-1 * delta) / T)
             # 如果新解有改进 or 没改进但满足Metropolis准则
             if delta < 0 or random.uniform() < P:
                 # 接受新解
@@ -155,8 +193,7 @@ def simulated_annealing(request_placement, instance_num, bandwidth, flow_matrix_
 
 
 def find_next_solution():
-
-    """ TODO: 实例移动到相邻几跳的满足资源约束的node """
+    """TODO: 实例移动到相邻几跳的满足资源约束的node"""
 
     new_solution = 0
 
@@ -164,8 +201,7 @@ def find_next_solution():
 
 
 def get_total_cost(solution):
-
-    """ TODO: 计算放置策略的总开销 """
+    """TODO: 计算放置策略的总开销"""
 
     # (np.mat(bandwidth_origin) - np.mat(bandwidth)).sum()
 
@@ -175,7 +211,6 @@ def get_total_cost(solution):
 
 
 if __name__ == "__main__":
-
     bandwidth = [
         [0, 100, 0, 0, 100, 0, 100, 0],
         [100, 0, 100, 0, 100, 100, 0, 0],
@@ -184,13 +219,24 @@ if __name__ == "__main__":
         [100, 100, 100, 0, 0, 100, 100, 0],
         [0, 100, 0, 100, 100, 0, 100, 100],
         [100, 0, 0, 0, 100, 100, 0, 100],
-        [0, 0, 0, 100, 0, 100, 100, 0]
+        [0, 0, 0, 100, 0, 100, 100, 0],
     ]
 
-    node_list = [ni.Node(0, 100, 0.9), ni.Node(1, 100, 0.9), ni.Node(2, 100, 0.9), ni.Node(3, 100, 0.9),
-                 ni.Node(4, 100, 0.9), ni.Node(5, 100, 0.9), ni.Node(6, 100, 0.8), ni.Node(7, 100, 0.8), ]
+    node_list = [
+        ni.Node(0, 100, 0.9),
+        ni.Node(1, 100, 0.9),
+        ni.Node(2, 100, 0.9),
+        ni.Node(3, 100, 0.9),
+        ni.Node(4, 100, 0.9),
+        ni.Node(5, 100, 0.9),
+        ni.Node(6, 100, 0.8),
+        ni.Node(7, 100, 0.8),
+    ]
 
-    request_list = [ni.Request(0, 0, 7, [1, 2, 3], 20, 0.95), ni.Request(1, 0, 3, [2, 3], 15, 0.9)]
+    request_list = [
+        ni.Request(0, 0, 7, [1, 2, 3], 20, 0.95),
+        ni.Request(1, 0, 3, [2, 3], 15, 0.9),
+    ]
 
     # d = distance(bandwidth, 0, 3)
 

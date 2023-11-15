@@ -9,8 +9,7 @@ import Global
 
 
 def data_init(nodes_file, matrix_file):
-
-    """ 从文件读入网络数据 """
+    """从文件读入网络数据"""
 
     # 读取节点信息
     node_list = []
@@ -42,8 +41,7 @@ def data_init(nodes_file, matrix_file):
 
 
 def get_requests(request_num, nf_list_length, rate, avail):
-
-    """ 随机生成请求集合 """
+    """随机生成请求集合"""
 
     request_list = []
 
@@ -51,9 +49,17 @@ def get_requests(request_num, nf_list_length, rate, avail):
     dst_list = [36, 48, 0, 29, 28, 46, 24, 38]
 
     for i in range(request_num):
-        r = ni.Request(i, random.choice(src_list), random.choice(dst_list),
-                       random.sample(list(range(Global.NF_TYPE_NUM)), random.randint(nf_list_length[0], nf_list_length[1])),
-                       random.randint(rate[0], rate[1]), random.uniform(avail[0], avail[1]))
+        r = ni.Request(
+            i,
+            random.choice(src_list),
+            random.choice(dst_list),
+            random.sample(
+                list(range(Global.NF_TYPE_NUM)),
+                random.randint(nf_list_length[0], nf_list_length[1]),
+            ),
+            random.randint(rate[0], rate[1]),
+            random.uniform(avail[0], avail[1]),
+        )
         request_list.append(r)
 
     return request_list
